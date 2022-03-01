@@ -1,1 +1,1 @@
-# smart-screen-mobile
+# smart-screen
