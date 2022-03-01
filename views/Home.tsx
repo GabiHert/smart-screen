@@ -2,10 +2,12 @@ import {StyleSheet, Text, View, Image, TouchableWithoutFeedback} from 'react-nat
 import * as ScreenOrientation from 'expo-screen-orientation';
 import PROPERTIES from "../src/main/aplication/config/properties"
 import {useEffect, useState} from "react";
-import CurrentDate from "../src/main/date/current-date/current-date"
-import {DateModel} from "../src/main/date/model/date";
+import {DateAdapter} from "../src/main/controllers/adapters/date-adapter";
+import {weatherCurrentAdapter} from "../src/main/controllers/adapters/weather-current-adapter";
+import {DateModel} from "../src/main/domain/date/model/date-model";
 import {useFocusEffect, useIsFocused} from "@react-navigation/native";
-import WeatherForecastHandler from "../src/main/weather/handler/weather-forecast-handler"
+import Call from "../src/main/useCases/uiCall/call"
+import {weatherDailyAdapter} from "../src/main/controllers/adapters/weather-daily-adapter";
 
 async function changeScreenOrientation() {
     await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT);
@@ -16,9 +18,41 @@ changeScreenOrientation();
 
 export default function Home(props: any) {
 
-    const [isActive, setIsActive] = useState<boolean>(true)
-    const [gotForecastOnce, setGotForecastOnce] = useState<boolean>(false)
-    const [forecast, setForecast] = useState<any>()
+    const [getCurrentForecastOnce, setGetCurrentForecastOnce] = useState<boolean>(true)
+    const [getDailyForecastOnce, setGetDailyForecastOnce] = useState<boolean>(true)
+    const [currentForecast, setCurrentForecast] = useState<any>({
+            main: {
+                feels_like: "-",
+                humidity: 0,
+                temp: "-",
+                temp_max: "-",
+                temp_min: "-",
+            },
+            weather: {
+                description: "-",
+                main: "-",
+            },
+        }
+    )
+
+    const [dailyForecast, setDailyForecast] = useState<any[]>([{
+            weekDay: "-",
+            date: "-",
+            humidity: 0,
+            temp: {
+                day: "-",
+                eve: "-",
+                max: "-",
+                min: "-",
+                morn: "-",
+                night: "-",
+            },
+            weather: {
+                description: "-",
+                main: "-",
+            }
+        }]
+    )
 
     const [currentDate, setCurrentDate] = useState<DateModel>({
         day: "",
@@ -36,29 +70,32 @@ export default function Home(props: any) {
 
     }
 
-
     useFocusEffect(() => {
 
-        const intervalCurrentDate = setInterval(() => {
-            setCurrentDate(CurrentDate.get())
-            if (currentDate.hour === "01") {
-                setForecast(WeatherForecastHandler.getWeatherForecast())
-                setGotForecastOnce(true)
-            }
+        const intervalCurrentDate = setInterval(async () => {
+            setCurrentDate(DateAdapter.getCurrentDate())
+
+            Call(() => weatherCurrentAdapter.getCurrent(), currentForecast, getCurrentForecastOnce, currentDate, ["", ""]).then(result => {
+                    setCurrentForecast(result)
+                    setGetCurrentForecastOnce(false)
+                }
+            )
+
+            Call(() => weatherDailyAdapter.getDaily(), dailyForecast, getDailyForecastOnce, currentDate, ["", ""]).then(result => {
+                    setDailyForecast(result)
+                    setGetDailyForecastOnce(false)
+                }
+            )
+
         }, 1000)
 
-        return () => clearInterval(intervalCurrentDate)
-    })
+        return () => clearInterval(intervalCurrentDate);
 
-    useEffect(() => {
-        if (!gotForecastOnce) {
-            setForecast(WeatherForecastHandler.getWeatherForecast())
-            setGotForecastOnce(true)
-        }
-    }, [])
+    })
 
 
     return (
+
         <View style={styles.columnsContainer}>
 
             <View style={styles.firstRowContainer}>
@@ -84,15 +121,15 @@ export default function Home(props: any) {
                 }}>
                     <View style={styles.weatherContainer}>
                         <View style={styles.temperatureContainer}>
-                            <Text style={styles.temperature}>30°C</Text>
+                            <Text style={styles.temperature}>{currentForecast.main.temp}</Text>
                             <Image
                                 style={styles.weatherDescriptionImage}
                                 source={require("../assets/images/rain.png")}
                             />
                         </View>
-                        <Text style={styles.weatherDescription}>Clear, clear Sky.</Text>
+                        <Text style={styles.weatherDescription}>{currentForecast.weather.description}</Text>
                         <Text style={styles.extremeWeatherConditions}>
-                            max. 30°C min 20°C
+                            from {dailyForecast[0].temp.min} to {dailyForecast[0].temp.max}
                         </Text>
                     </View>
                 </TouchableWithoutFeedback>
