@@ -1,9 +1,10 @@
-import {StyleSheet, Text, View, Pressable, Image} from 'react-native';
+import {StyleSheet, Text, View, Pressable, Image, SafeAreaView, ScrollView} from 'react-native';
 import Properties from '../src/main/aplication/config/properties'
 import {useFocusEffect} from "@react-navigation/native";
 import Call from "../src/main/useCases/uiCall/call";
 import {weatherDailyAdapter} from "../src/main/controllers/adapters/weather-daily-adapter";
 import {useState} from "react";
+import GetImages from "../src/main/useCases/get-images/get-images";
 
 
 export default function weather(props: any) {
@@ -156,6 +157,7 @@ export default function weather(props: any) {
             paddingBottom: "1%",
             paddingLeft: "3%",
             paddingRight: "3%",
+            width: "50%"
         },
         secondRowContainer: {
             flex: 0.33,
@@ -172,7 +174,7 @@ export default function weather(props: any) {
             paddingBottom: "3%",
             paddingLeft: "3%",
             paddingRight: "3%",
-            borderColor: "white",
+            borderColor: "green",
             borderWidth: 2
         },
         buttonContainer: {
@@ -184,7 +186,7 @@ export default function weather(props: any) {
             borderWidth: 1.5,
             borderColor: "white",
             borderRadius: 10,
-            flex: 0.6,
+            flex: 1,
             paddingLeft: "3%",
             paddingRight: "3%"
         },
@@ -192,7 +194,7 @@ export default function weather(props: any) {
         line: {
             borderBottomColor: 'white',
             borderBottomWidth: 1,
-            paddingBottom: "1%",
+            paddingBottom: "4%",
         },
         weatherDescription: {
             paddingTop: "3%",
@@ -205,18 +207,22 @@ export default function weather(props: any) {
         temperatureContainer: {
 
             flexDirection: "row",
-        }
+        },
+        weatherDescriptionImage: {width: 30, height: 30},
+        backButtonImage: {width: 32, height: 32}
 
     })
 
 
     return (
+
         <View style={styles.columnsContainer}>
             <View style={styles.buttonContainer}>
                 <Pressable onPress={() => props.navigation.navigate("Home")}>
-                    <Image source={require("../assets/images/back.png")}/>
+                    <Image style={styles.backButtonImage} source={require("../assets/images/back.png")}/>
                 </Pressable>
             </View>
+
 
             <View style={styles.firstRowContainer}>
                 <View style={styles.weatherForecastContainer}>
@@ -224,88 +230,99 @@ export default function weather(props: any) {
 
                     <View style={styles.line}></View>
 
-                    <View style={styles.weatherContainer}>
-                        <View style={styles.temperatureContainer}>
-                            <Text style={styles.weatherDescription}>{dailyForecast[1].weekDay} </Text>
-                            <Text
-                                style={styles.weatherDescription}>{dailyForecast[1].temp.min} to {dailyForecast[1].temp.max}</Text>
-                            <Image source={require("../assets/images/clouds.png")}/>
-                        </View>
-                        <Text
-                            style={styles.secondWeatherDescription}>{dailyForecast[1].weather.main},{dailyForecast[1].weather.description}</Text>
-                    </View>
-
-                    <View style={styles.line}></View>
-
-                    <View style={styles.weatherContainer}>
-                        <View style={styles.temperatureContainer}>
-                            <Text style={styles.weatherDescription}>{dailyForecast[2].weekDay} </Text>
-                            <Text
-                                style={styles.weatherDescription}>{dailyForecast[2].temp.min} to {dailyForecast[2].temp.max}</Text>
-                            <Image source={require("../assets/images/clouds.png")}/>
-                        </View>
-                        <Text
-                            style={styles.secondWeatherDescription}>{dailyForecast[2].weather.main},{dailyForecast[2].weather.description}</Text>
-                    </View>
-
-                    <View style={styles.line}></View>
-
-                    <View style={styles.weatherContainer}>
-                        <View style={styles.temperatureContainer}>
-                            <Text style={styles.weatherDescription}>{dailyForecast[3].weekDay} </Text>
-                            <Text
-                                style={styles.weatherDescription}>{dailyForecast[3].temp.min} to {dailyForecast[3].temp.max}</Text>
-                            <Image source={require("../assets/images/clouds.png")}/>
-                        </View>
-                        <Text
-                            style={styles.secondWeatherDescription}>{dailyForecast[3].weather.main},{dailyForecast[3].weather.description}</Text>
-                    </View>
-
-                    <View style={styles.line}></View>
-
-                    <View style={styles.weatherContainer}>
-                        <View style={styles.temperatureContainer}>
-                            <Text style={styles.weatherDescription}>{dailyForecast[4].weekDay} </Text>
-                            <Text
-                                style={styles.weatherDescription}>{dailyForecast[4].temp.min} to {dailyForecast[4].temp.max}</Text>
-                            <Image source={require("../assets/images/clouds.png")}/>
-                        </View>
-                        <Text
-                            style={styles.secondWeatherDescription}>{dailyForecast[4].weather.main},{dailyForecast[4].weather.description}</Text>
-                    </View>
-
-                    <View style={styles.line}></View>
-
-                    <View style={styles.weatherContainer}>
-                        <View style={styles.temperatureContainer}>
-                            <Text style={styles.weatherDescription}>{dailyForecast[5].weekDay} </Text>
-                            <Text
-                                style={styles.weatherDescription}>{dailyForecast[5].temp.min} to {dailyForecast[5].temp.max}</Text>
-                            <Image source={require("../assets/images/clouds.png")}/>
-                        </View>
-                        <Text
-                            style={styles.secondWeatherDescription}>{dailyForecast[5].weather.main},{dailyForecast[5].weather.description}</Text>
-                    </View>
-
-                    <View style={styles.line}></View>
-
-                    <View style={styles.weatherContainer}>
-                        <View style={styles.temperatureContainer}>
-                            <Text style={styles.weatherDescription}>{dailyForecast[6].weekDay} </Text>
-                            <Text
-                                style={styles.weatherDescription}>{dailyForecast[6].temp.min} to {dailyForecast[6].temp.max}</Text>
-                            <Image source={require("../assets/images/clouds.png")}/>
-                        </View>
-                        <Text
-                            style={styles.secondWeatherDescription}>{dailyForecast[6].weather.main},{dailyForecast[6].weather.description}</Text>
-                    </View>
+                    <SafeAreaView style={styles.columnsContainer}>
+                        <ScrollView>
 
 
+                            <View style={styles.weatherContainer}>
+                                <View style={styles.temperatureContainer}>
+                                    <Text style={styles.weatherDescription}>{dailyForecast[1].weekDay} </Text>
+                                    <Text
+                                        style={styles.weatherDescription}>{dailyForecast[1].temp.min} to {dailyForecast[1].temp.max}</Text>
+                                    <Image style={styles.weatherDescriptionImage}
+                                           source={GetImages.get(dailyForecast[1].weather.main)}/>
+                                </View>
+                                <Text
+                                    style={styles.secondWeatherDescription}>{dailyForecast[1].weather.main},{dailyForecast[1].weather.description}</Text>
+                            </View>
+
+                            <View style={styles.line}></View>
+
+                            <View style={styles.weatherContainer}>
+                                <View style={styles.temperatureContainer}>
+                                    <Text style={styles.weatherDescription}>{dailyForecast[2].weekDay} </Text>
+                                    <Text
+                                        style={styles.weatherDescription}>{dailyForecast[2].temp.min} to {dailyForecast[2].temp.max}</Text>
+                                    <Image style={styles.weatherDescriptionImage}
+                                           source={GetImages.get(dailyForecast[2].weather.main)}/>
+                                </View>
+                                <Text
+                                    style={styles.secondWeatherDescription}>{dailyForecast[2].weather.main},{dailyForecast[2].weather.description}</Text>
+                            </View>
+
+                            <View style={styles.line}></View>
+
+                            <View style={styles.weatherContainer}>
+                                <View style={styles.temperatureContainer}>
+                                    <Text style={styles.weatherDescription}>{dailyForecast[3].weekDay} </Text>
+                                    <Text
+                                        style={styles.weatherDescription}>{dailyForecast[3].temp.min} to {dailyForecast[3].temp.max}</Text>
+                                    <Image style={styles.weatherDescriptionImage}
+                                           source={GetImages.get(dailyForecast[3].weather.main)}/>
+                                </View>
+                                <Text
+                                    style={styles.secondWeatherDescription}>{dailyForecast[3].weather.main},{dailyForecast[3].weather.description}</Text>
+                            </View>
+
+                            <View style={styles.line}></View>
+
+                            <View style={styles.weatherContainer}>
+                                <View style={styles.temperatureContainer}>
+                                    <Text style={styles.weatherDescription}>{dailyForecast[4].weekDay} </Text>
+                                    <Text
+                                        style={styles.weatherDescription}>{dailyForecast[4].temp.min} to {dailyForecast[4].temp.max}</Text>
+                                    <Image style={styles.weatherDescriptionImage}
+                                           source={GetImages.get(dailyForecast[4].weather.main)}/>
+                                </View>
+                                <Text
+                                    style={styles.secondWeatherDescription}>{dailyForecast[4].weather.main},{dailyForecast[4].weather.description}</Text>
+                            </View>
+
+                            <View style={styles.line}></View>
+
+                            <View style={styles.weatherContainer}>
+                                <View style={styles.temperatureContainer}>
+                                    <Text style={styles.weatherDescription}>{dailyForecast[5].weekDay} </Text>
+                                    <Text
+                                        style={styles.weatherDescription}>{dailyForecast[5].temp.min} to {dailyForecast[5].temp.max}</Text>
+                                    <Image style={styles.weatherDescriptionImage}
+                                           source={GetImages.get(dailyForecast[5].weather.main)}/>
+                                </View>
+                                <Text
+                                    style={styles.secondWeatherDescription}>{dailyForecast[5].weather.main},{dailyForecast[5].weather.description}</Text>
+                            </View>
+
+                            <View style={styles.line}></View>
+
+                            <View style={styles.weatherContainer}>
+                                <View style={styles.temperatureContainer}>
+                                    <Text style={styles.weatherDescription}>{dailyForecast[6].weekDay} </Text>
+                                    <Text
+                                        style={styles.weatherDescription}>{dailyForecast[6].temp.min} to {dailyForecast[6].temp.max}</Text>
+                                    <Image style={styles.weatherDescriptionImage}
+                                           source={GetImages.get(dailyForecast[6].weather.main)}/>
+                                </View>
+                                <Text
+                                    style={styles.secondWeatherDescription}>{dailyForecast[6].weather.main},{dailyForecast[6].weather.description}</Text>
+                            </View>
+                        </ScrollView>
+
+                    </SafeAreaView>
                 </View>
 
             </View>
-
         </View>
+
     )
 
 }

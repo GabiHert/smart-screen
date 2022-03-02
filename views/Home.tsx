@@ -8,6 +8,7 @@ import {DateModel} from "../src/main/domain/date/model/date-model";
 import {useFocusEffect, useIsFocused} from "@react-navigation/native";
 import Call from "../src/main/useCases/uiCall/call"
 import {weatherDailyAdapter} from "../src/main/controllers/adapters/weather-daily-adapter";
+import GetImages from "../src/main/useCases/get-images/get-images";
 
 async function changeScreenOrientation() {
     await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT);
@@ -87,6 +88,7 @@ export default function Home(props: any) {
                 }
             )
 
+
         }, 1000)
 
         return () => clearInterval(intervalCurrentDate);
@@ -124,8 +126,9 @@ export default function Home(props: any) {
                             <Text style={styles.temperature}>{currentForecast.main.temp}</Text>
                             <Image
                                 style={styles.weatherDescriptionImage}
-                                source={require("../assets/images/rain.png")}
+                                source={GetImages.get(currentForecast.weather.main)}
                             />
+
                         </View>
                         <Text style={styles.weatherDescription}>{currentForecast.weather.description}</Text>
                         <Text style={styles.extremeWeatherConditions}>
@@ -237,10 +240,11 @@ const styles = StyleSheet.create({
     },
     extremeWeatherConditions: {flex: 0.33, color: "white", fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.TERTIARY_INFO},
     weatherDescription: {flex: 0.33, color: "white", fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.TERTIARY_INFO},
-    weatherDescriptionImage: {width: 30, height: 30},
+    weatherDescriptionImage: {width: 32, height: 32},
     temperature: {
         color: "white",
         fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.PRIMARY_INFO,
+        paddingRight: "3%"
     },
     homeIoContainer: {
         width: "27%",
