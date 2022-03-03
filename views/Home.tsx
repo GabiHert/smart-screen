@@ -71,6 +71,10 @@ export default function Home(props: any) {
 
     }
 
+    function goToHomeIoComponent() {
+        props.navigation.navigate("HomeIo")
+    }
+
     useFocusEffect(() => {
 
         const intervalCurrentDate = setInterval(async () => {
@@ -143,9 +147,12 @@ export default function Home(props: any) {
             </View>
 
             <View style={styles.thirdRowContainer}>
-                <View style={styles.homeIoContainer}>
-                    <Text style={styles.homeIoText}>Home.io</Text>
-                </View>
+                <TouchableWithoutFeedback onPress={() => goToHomeIoComponent()}>
+                    <View style={styles.homeIoContainer}>
+                        <Text style={styles.homeIoText}>Home.io</Text>
+                    </View>
+                </TouchableWithoutFeedback>
+
                 <View style={styles.spacing}></View>
                 <View style={styles.testContainer}></View>
                 <View style={styles.spacing}></View>
