@@ -36,10 +36,6 @@ class WeatherService {
 
         const alertsParsed: AlertsParsed[] = AlertsForecastParser.parse(forecast);
 
-        if (!alertsParsed) {
-            return "No alerts";
-        }
-
         logger.info({
             event: "WeatherService.getAlerts",
             details: "Process finished",

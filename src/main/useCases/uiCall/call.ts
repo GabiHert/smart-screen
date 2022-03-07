@@ -14,10 +14,12 @@ async function Call(call, defaultReturn: unknown, callNow: boolean = false, curr
     }
 
     if (shouldCall || callNow) {
+
         return await call().then((result) => {
-            logger.info({event: "Call", details: "Process finished with resolved promise return"})
+            logger.info({event: "Call", details: "Process finished with resolved promise return", result})
             return result
         })
+
     }
     logger.info({event: "Call", details: "Process finished with default return"})
     return defaultReturn

@@ -5,11 +5,16 @@ import Call from "../src/main/useCases/uiCall/call";
 import {weatherDailyAdapter} from "../src/main/controllers/adapters/weather-daily-adapter";
 import {useState} from "react";
 import GetImages from "../src/main/useCases/get-images/get-images";
+import {weatherAlertsAdapter} from "../src/main/controllers/adapters/weather-alerts-adapter";
+import AlertsUiBuilder from "../src/main/useCases/alerts/builder/alerts-ui-builder";
 
 
 export default function weather(props: any) {
 
     const [getDailyForecastOnce, setGetDailyForecastOnce] = useState<boolean>(true)
+    const [getAlertsOnce, setGetAlertsOnce] = useState<boolean>(true)
+    const [alerts, setAlerts] = useState<string>("")
+
     const [dailyForecast, setDailyForecast] = useState<any[]>([{
             weekDay: "loading...",
             date: "loading...",
@@ -135,6 +140,12 @@ export default function weather(props: any) {
                 }
             )
 
+            Call(() => weatherAlertsAdapter.getAlerts(), alerts, getAlertsOnce).then(result => {
+                setGetAlertsOnce(false);
+                console.log({result})
+                setAlerts(AlertsUiBuilder.build(result));
+            })
+
 
         }, 1000)
 
@@ -159,24 +170,6 @@ export default function weather(props: any) {
             paddingRight: "3%",
             width: "50%"
         },
-        secondRowContainer: {
-            flex: 0.33,
-            flexDirection: "row",
-            backgroundColor: "black",
-            paddingBottom: "3%",
-            paddingLeft: "3%",
-            paddingRight: "3%",
-        },
-        thirdRowContainer: {
-            flex: 0.33,
-            flexDirection: "row",
-            backgroundColor: "black",
-            paddingBottom: "3%",
-            paddingLeft: "3%",
-            paddingRight: "3%",
-            borderColor: "green",
-            borderWidth: 2
-        },
         buttonContainer: {
             paddingBottom: "0.5%",
             width: "4%"
@@ -186,9 +179,9 @@ export default function weather(props: any) {
             borderWidth: 1.5,
             borderColor: "white",
             borderRadius: 10,
-            flex: 1,
             paddingLeft: "3%",
-            paddingRight: "3%"
+            paddingRight: "3%",
+            width: "100%"
         },
         weatherForecastTitle: {color: "white", fontSize: Properties.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO},
         line: {
@@ -209,8 +202,15 @@ export default function weather(props: any) {
             flexDirection: "row",
         },
         weatherDescriptionImage: {width: 30, height: 30},
-        backButtonImage: {width: 32, height: 32}
-
+        backButtonImage: {width: 32, height: 32},
+        space: {},
+        alertsView: {backgroundColor: "black", width: "100%"},
+        alertsText: {
+            color: "white",
+            paddingTop: "30%",
+            textAlign: "center",
+            fontSize: Properties.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO
+        }
     })
 
 
@@ -320,7 +320,15 @@ export default function weather(props: any) {
                     </SafeAreaView>
                 </View>
 
+                <View style={styles.space}></View>
+
+                <View style={styles.alertsView}>
+                    <Text style={styles.alertsText}>{alerts}</Text>
+                </View>
+
+
             </View>
+
         </View>
 
     )
