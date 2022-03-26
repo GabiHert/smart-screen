@@ -1,25 +1,25 @@
 class Logger {
-  log(message) {
-    console.log(message);
-  }
+    log(message) {
+        console.log(message);
+    }
 
-  line() {
-    console.log(
-      "----------------------------------------------------------------"
-    );
-  }
+    line() {
+        console.log(
+            "----------------------------------------------------------------"
+        );
+    }
 
-  error(err: any) {
-    console.error(JSON.stringify(err));
-  }
+    error(err: any) {
+        console.error("[ERROR]::" + JSON.stringify(err));
+    }
 
-  info(info) {
-    console.info(JSON.stringify(info));
-  }
+    info(info) {
+        console.info("[INFO]::" + JSON.stringify(info));
+    }
 
-  warn(warn) {
-    console.log(JSON.stringify(warn));
-  }
+    warn(warn) {
+        console.log("[WARN]::" + JSON.stringify(warn));
+    }
 }
 
 export default new Logger();
