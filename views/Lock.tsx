@@ -278,14 +278,14 @@ export default function Home(props: any) {
 
             Call(() => weatherCurrentAdapter.getCurrent(), currentForecast, getCurrentForecastOnce, currentDate, PROPERTIES.TIME.HALF_HOURLY).then(response => {
 
-                setCurrentForecast(response.result);
+                    setCurrentForecast(response.result);
                     setGetCurrentForecastOnce(false);
                 },
             );
 
             Call(() => weatherDailyAdapter.getDaily(), dailyForecast, getDailyForecastOnce, currentDate, PROPERTIES.TIME.HOURLY).then(response => {
 
-                setDailyForecast(response.result);
+                    setDailyForecast(response.result);
                     setGetDailyForecastOnce(false);
                 },
             );
@@ -297,9 +297,9 @@ export default function Home(props: any) {
             });
 
             Call(() => taskAdapter.get(), tasks, getTasksOnce, currentDate, PROPERTIES.TIME.QUARTER_HOURLY).then(response => {
-                    setTasks(response.result);
-                    setTodayTasks(FilterTasks.today(response.result))
-                    setTomorrowTasks(FilterTasks.tomorrow(response.result))
+                setTasks(response.result);
+                setTodayTasks(FilterTasks.today(response.result))
+                setTomorrowTasks(FilterTasks.tomorrow(response.result))
 
                 setGetTasksOnce(false);
             });

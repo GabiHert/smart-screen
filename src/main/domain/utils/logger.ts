@@ -14,7 +14,7 @@ class Logger {
     }
 
     info(info) {
-        console.info("[INFO]::" + JSON.stringify(info));
+        //console.info("[INFO]::" + JSON.stringify(info));
     }
 
     warn(warn) {

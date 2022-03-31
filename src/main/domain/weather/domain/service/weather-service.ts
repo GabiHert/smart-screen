@@ -6,7 +6,7 @@ import AlertsForecastParser from "../parse/alerts-forecast-parser";
 import {Current} from "../model/current";
 import {CurrentParsed} from "../model/current-parsed";
 import CurrentParser from "../parse/current-parser";
-import logger from "../utils/logger";
+import logger from "../../../utils/logger";
 
 class WeatherService {
     async getDailyForecast() {

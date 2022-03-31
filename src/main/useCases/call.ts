@@ -7,9 +7,8 @@ async function Call(call, defaultReturn: unknown, callNow: boolean = false, curr
 
     if (whenToCall && currentDate) {
         const currentTime = `${currentDate.hour}:${currentDate.minute}`
-
         whenToCall.forEach((timeToCall) => {
-            if (currentTime === timeToCall || currentTime === `${timeToCall}:00`) {
+            if ((currentTime === timeToCall )||( currentTime === `${timeToCall}:00`)) {
                 shouldCall = true
             }
         })
@@ -18,7 +17,7 @@ async function Call(call, defaultReturn: unknown, callNow: boolean = false, curr
     if (shouldCall || callNow) {
 
         return await call().then((result) => {
-            logger.info({event: "Call", details: "Process finished with resolved promise return", result})
+            logger.warn({event: "Call", details: "Process finished with resolved promise return", result})
             return {result, called: true}
         })
 

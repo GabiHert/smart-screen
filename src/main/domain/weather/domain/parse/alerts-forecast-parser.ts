@@ -1,7 +1,7 @@
 import { WeatherForecast } from "../model/weather-forecast";
 import { Alerts } from "../model/alerts";
 import { AlertsParsed } from "../model/alerts-parsed";
-import Logger from "../utils/logger";
+import Logger from "../../../utils/logger";
 
 class AlertsForecastParser {
   parse(forecast: WeatherForecast): AlertsParsed[] {

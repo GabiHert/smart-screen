@@ -7,13 +7,15 @@ import {useState} from "react";
 import GetImages from "../src/main/useCases/get-images/get-images";
 import {weatherAlertsAdapter} from "../src/main/controllers/adapters/weather-alerts-adapter";
 import AlertsUiBuilder from "../src/main/useCases/alerts/builder/alerts-ui-builder";
+import PROPERTIES from "../src/main/aplication/config/properties";
 
 
 export default function weather(props: any) {
 
     const [getDailyForecastOnce, setGetDailyForecastOnce] = useState<boolean>(true)
     const [getAlertsOnce, setGetAlertsOnce] = useState<boolean>(true)
-    const [alerts, setAlerts] = useState<string>("")
+    const [alerts, setAlerts] = useState<any>({})
+    const [alertsString, setAlertsString] = useState<string>("")
 
     const [dailyForecast, setDailyForecast] = useState<any[]>([{
             weekDay: "loading...",
@@ -141,10 +143,12 @@ export default function weather(props: any) {
             )
 
             Call(() => weatherAlertsAdapter.getAlerts(), alerts, getAlertsOnce).then(result => {
+
+                setAlerts(result);
+                setAlertsString(AlertsUiBuilder.build(result));
                 setGetAlertsOnce(false);
-                console.log({result})
-                setAlerts(AlertsUiBuilder.build(result));
-            })
+
+            });
 
 
         }, 1000)
@@ -159,16 +163,17 @@ export default function weather(props: any) {
             flexDirection: "column",
             backgroundColor: "black",
             paddingTop: "2%",
-            paddingLeft: "1%"
+            paddingLeft: "1%",
+            paddingBottom: "1%",
         },
         firstRowContainer: {
-            flex: 1,
             flexDirection: "row",
             backgroundColor: "black",
             paddingBottom: "1%",
             paddingLeft: "3%",
             paddingRight: "3%",
-            width: "50%"
+            width: "100%",
+            flex:1
         },
         buttonContainer: {
             paddingBottom: "0.5%",
@@ -181,9 +186,9 @@ export default function weather(props: any) {
             borderRadius: 10,
             paddingLeft: "3%",
             paddingRight: "3%",
-            width: "100%"
+            width: "50%"
         },
-        weatherForecastTitle: {color: "white", fontSize: Properties.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO},
+        weatherForecastTitle: {color: "white", fontSize: Properties.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO,    fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY},
         line: {
             borderBottomColor: 'white',
             borderBottomWidth: 1,
@@ -193,10 +198,11 @@ export default function weather(props: any) {
             paddingTop: "3%",
             paddingRight: "3%",
             color: "white",
-            fontSize: Properties.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO
+            fontSize: Properties.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO,
+            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY
         },
         weatherContainer: {},
-        secondWeatherDescription: {color: "white", fontSize: Properties.REACT_NATIVE.FONT.SIZE.TERTIARY_INFO},
+        secondWeatherDescription: {color: "white", fontSize: Properties.REACT_NATIVE.FONT.SIZE.TERTIARY_INFO,    fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY},
         temperatureContainer: {
 
             flexDirection: "row",
@@ -204,12 +210,12 @@ export default function weather(props: any) {
         weatherDescriptionImage: {width: 30, height: 30},
         backButtonImage: {width: 32, height: 32},
         space: {},
-        alertsView: {backgroundColor: "black", width: "100%"},
+        alertsView: {backgroundColor: "black", width:"50%"},
         alertsText: {
             color: "white",
-            paddingTop: "30%",
             textAlign: "center",
-            fontSize: Properties.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO
+            fontSize: Properties.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO,
+            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY
         }
     })
 
@@ -320,12 +326,12 @@ export default function weather(props: any) {
                     </SafeAreaView>
                 </View>
 
-                <View style={styles.space}></View>
 
-                <View style={styles.alertsView}>
-                    <Text style={styles.alertsText}>{alerts}</Text>
-                </View>
-
+                <SafeAreaView style={styles.alertsView}>
+                    <ScrollView>
+                    <Text style={styles.alertsText}>{alertsString}</Text>
+                    </ScrollView>
+                </SafeAreaView>
 
             </View>
 

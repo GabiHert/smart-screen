@@ -3,7 +3,7 @@ import axios from "axios";
 import { WeatherWebServiceAdapter } from "../../domain/adapters/weather-web-service-adapter";
 import ForecastUrlBuilder from "../builder/forecast-url-builder";
 import PROPERTIES from "../../application/config/properties";
-import Logger from "../../domain/utils/logger";
+import Logger from "../../../utils/logger";
 import CurrentUrlBuilder from "../builder/current-url-builder";
 import { CurrentDto } from "../../delivery/dto/current-dto";
 import WeatherWebServiceRequestError from "../../domain/exceptions/weather-web-service-request-error";

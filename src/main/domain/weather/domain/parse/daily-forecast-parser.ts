@@ -1,6 +1,6 @@
 import { WeatherForecast } from "../model/weather-forecast";
 import WeekDayBuilder from "../builder/week-day-builder";
-import Logger from "../utils/logger";
+import Logger from "../../../utils/logger";
 import { DailyForecastParsed } from "../model/dailly-forecast-parsed";
 
 class DailyForecastParser {

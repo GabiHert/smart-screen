@@ -3,6 +3,7 @@ import Properties from '../src/main/aplication/config/properties'
 import {useState} from "react";
 import {blynkHandlerAdapter} from "../src/main/controllers/adapters/blynk-handler-adapter";
 import Call from "../src/main/useCases/uiCall/call";
+import PROPERTIES from "../src/main/aplication/config/properties";
 
 export default function HomeIo(props: any) {
 
@@ -121,6 +122,7 @@ export default function HomeIo(props: any) {
 
         buttonText: {
             fontSize: 50,
+            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY,
             color: "white",
             paddingTop: "15%",
             paddingLeft: "20%"
@@ -128,6 +130,7 @@ export default function HomeIo(props: any) {
 
         brightnessButtonText: {
             fontSize: 50,
+            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY,
             color: "white",
             paddingTop: "15%",
             paddingLeft: "45%"

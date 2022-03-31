@@ -1,6 +1,6 @@
 import { Current } from "../model/current";
 import { CurrentParsed } from "../model/current-parsed";
-import Logger from "../utils/logger";
+import Logger from "../../../utils/logger";
 
 class CurrentParser {
   Parse(current: Current): CurrentParsed {
