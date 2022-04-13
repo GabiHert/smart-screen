@@ -2,8 +2,8 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Home from "../smart-screen/views/Home"
 import Weather from "../smart-screen/views/Weather"
-import {StyleSheet} from "react-native";
 import HomeIo from "./views/HomeIo";
+import Lock from "./views/Lock"
 import AppLoading from "expo-app-loading"
 import {
     Exo_100Thin,
@@ -57,6 +57,7 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator>
+                <Stack.Screen name="Lock" component={Lock} options={{headerShown: false}}/>
                 <Stack.Screen name="Home" component={Home} options={{headerShown: false}}/>
                 <Stack.Screen name="Weather" component={Weather} options={{headerShown: false}}/>
                 <Stack.Screen name="HomeIo" component={HomeIo} options={{headerShown: false}}/>

@@ -6,7 +6,9 @@ import {WeatherAlertsAdapter} from "../../../../controllers/adapters/weather-ale
 class AlertsHandler implements WeatherAlertsAdapter {
     async getAlerts(): Promise<any> {
         try {
-            return await WeatherService.getAlerts();
+            const alerts = await WeatherService.getAlerts();
+            if(!alerts) return ""
+            return alerts
         } catch (ex) {
             const errorParsed = ErrorParser.parse(ex);
 

@@ -1,9 +1,9 @@
-import {StyleSheet, Text, View, Pressable, Image, SafeAreaView, ScrollView} from 'react-native';
+import {StyleSheet, Text, View, Pressable, Image, SafeAreaView, ScrollView, Alert} from 'react-native';
 import Properties from '../src/main/aplication/config/properties'
 import {useFocusEffect} from "@react-navigation/native";
-import Call from "../src/main/useCases/uiCall/call";
+import Call from "../src/main/useCases/call";
 import {weatherDailyAdapter} from "../src/main/controllers/adapters/weather-daily-adapter";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import GetImages from "../src/main/useCases/get-images/get-images";
 import {weatherAlertsAdapter} from "../src/main/controllers/adapters/weather-alerts-adapter";
 import AlertsUiBuilder from "../src/main/useCases/alerts/builder/alerts-ui-builder";
@@ -16,6 +16,7 @@ export default function weather(props: any) {
     const [getAlertsOnce, setGetAlertsOnce] = useState<boolean>(true)
     const [alerts, setAlerts] = useState<any>({})
     const [alertsString, setAlertsString] = useState<string>("")
+    const [isMounted, setIsMounted] = useState<boolean>(true);
 
     const [dailyForecast, setDailyForecast] = useState<any[]>([{
             weekDay: "loading...",
@@ -131,21 +132,38 @@ export default function weather(props: any) {
             }
         }]
     )
+    useEffect(() => {
+        setIsMounted(true)               // note mutable flag
+
+        return () => { setIsMounted(false) }; // cleanup toggles value, if unmounted
+    }, []);
+
 
     useFocusEffect(() => {
 
         const intervalCurrentDate = setInterval(async () => {
 
-            Call(() => weatherDailyAdapter.getDaily(), dailyForecast, getDailyForecastOnce).then(result => {
-                    setDailyForecast(result)
+            Call(() => weatherDailyAdapter.getDaily(), dailyForecast, getDailyForecastOnce).then(response => {
+                if(!response ||!isMounted) return
+                if(response.error){
+                    Alert.alert("Weather forecast error",response.error)
+                    setGetDailyForecastOnce(false)
+                    return
+                }
+                    setDailyForecast(response.result)
                     setGetDailyForecastOnce(false)
                 }
             )
 
-            Call(() => weatherAlertsAdapter.getAlerts(), alerts, getAlertsOnce).then(result => {
-
-                setAlerts(result);
-                setAlertsString(AlertsUiBuilder.build(result));
+            Call(() => weatherAlertsAdapter.getAlerts(), alerts, getAlertsOnce).then(response => {
+                if(!response ||!isMounted) return
+                if(response.error){
+                    Alert.alert("Weather alerts error",response.error)
+                    setGetAlertsOnce(false);
+                    return
+                }
+                setAlerts(response.result);
+                setAlertsString(AlertsUiBuilder.build(response.result));
                 setGetAlertsOnce(false);
 
             });
@@ -186,7 +204,7 @@ export default function weather(props: any) {
             borderRadius: 10,
             paddingLeft: "3%",
             paddingRight: "3%",
-            width: "50%"
+            width: "64%"
         },
         weatherForecastTitle: {color: "white", fontSize: Properties.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO,    fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY},
         line: {
@@ -213,9 +231,11 @@ export default function weather(props: any) {
         alertsView: {backgroundColor: "black", width:"50%"},
         alertsText: {
             color: "white",
-            textAlign: "center",
             fontSize: Properties.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO,
-            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY
+            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY,
+            width:"75%",
+            paddingLeft:"3%",
+            paddingRight:"3%"
         }
     })
 
@@ -242,7 +262,7 @@ export default function weather(props: any) {
 
                             <View style={styles.weatherContainer}>
                                 <View style={styles.temperatureContainer}>
-                                    <Text style={styles.weatherDescription}>{dailyForecast[1].weekDay} </Text>
+                                    <Text style={styles.weatherDescription}>{dailyForecast[1].weekDay} {dailyForecast[1].date} -</Text>
                                     <Text
                                         style={styles.weatherDescription}>{dailyForecast[1].temp.min} to {dailyForecast[1].temp.max}</Text>
                                     <Image style={styles.weatherDescriptionImage}
@@ -256,7 +276,7 @@ export default function weather(props: any) {
 
                             <View style={styles.weatherContainer}>
                                 <View style={styles.temperatureContainer}>
-                                    <Text style={styles.weatherDescription}>{dailyForecast[2].weekDay} </Text>
+                                    <Text style={styles.weatherDescription}>{dailyForecast[2].weekDay} {dailyForecast[2].date} -</Text>
                                     <Text
                                         style={styles.weatherDescription}>{dailyForecast[2].temp.min} to {dailyForecast[2].temp.max}</Text>
                                     <Image style={styles.weatherDescriptionImage}
@@ -270,7 +290,7 @@ export default function weather(props: any) {
 
                             <View style={styles.weatherContainer}>
                                 <View style={styles.temperatureContainer}>
-                                    <Text style={styles.weatherDescription}>{dailyForecast[3].weekDay} </Text>
+                                    <Text style={styles.weatherDescription}>{dailyForecast[3].weekDay} {dailyForecast[3].date} -</Text>
                                     <Text
                                         style={styles.weatherDescription}>{dailyForecast[3].temp.min} to {dailyForecast[3].temp.max}</Text>
                                     <Image style={styles.weatherDescriptionImage}
@@ -284,7 +304,7 @@ export default function weather(props: any) {
 
                             <View style={styles.weatherContainer}>
                                 <View style={styles.temperatureContainer}>
-                                    <Text style={styles.weatherDescription}>{dailyForecast[4].weekDay} </Text>
+                                    <Text style={styles.weatherDescription}>{dailyForecast[4].weekDay} {dailyForecast[4].date} -</Text>
                                     <Text
                                         style={styles.weatherDescription}>{dailyForecast[4].temp.min} to {dailyForecast[4].temp.max}</Text>
                                     <Image style={styles.weatherDescriptionImage}
@@ -298,7 +318,7 @@ export default function weather(props: any) {
 
                             <View style={styles.weatherContainer}>
                                 <View style={styles.temperatureContainer}>
-                                    <Text style={styles.weatherDescription}>{dailyForecast[5].weekDay} </Text>
+                                    <Text style={styles.weatherDescription}>{dailyForecast[5].weekDay} {dailyForecast[5].date} -</Text>
                                     <Text
                                         style={styles.weatherDescription}>{dailyForecast[5].temp.min} to {dailyForecast[5].temp.max}</Text>
                                     <Image style={styles.weatherDescriptionImage}
@@ -312,7 +332,7 @@ export default function weather(props: any) {
 
                             <View style={styles.weatherContainer}>
                                 <View style={styles.temperatureContainer}>
-                                    <Text style={styles.weatherDescription}>{dailyForecast[6].weekDay} </Text>
+                                    <Text style={styles.weatherDescription}>{dailyForecast[6].weekDay} {dailyForecast[6].date} -</Text>
                                     <Text
                                         style={styles.weatherDescription}>{dailyForecast[6].temp.min} to {dailyForecast[6].temp.max}</Text>
                                     <Image style={styles.weatherDescriptionImage}

@@ -10,8 +10,9 @@ class AlertsUiBuilder {
 
 
         let alertsString = ""
+        if(!(Symbol.iterator in Object(alerts))) return;
         for (const alert of alerts) {
-            const alertString = ` Alert from ${alert.sender}: ${alert.description}.`
+            const alertString = ` Alert from ${alert.sender}: ${alert.description}`
             alertsString = `${alertsString} ${alertString} \n \n`
         }
 

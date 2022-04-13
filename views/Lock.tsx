@@ -1,6 +1,6 @@
 import { Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import PROPERTIES from '../src/main/aplication/config/properties';
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { DateAdapter } from '../src/main/controllers/adapters/date-adapter';
 import { weatherCurrentAdapter } from '../src/main/controllers/adapters/weather-current-adapter';
 import { DateModel } from '../src/main/domain/date/model/date-model';
@@ -23,9 +23,8 @@ export default function Home(props: any) {
 
 
     const [getCurrentForecastOnce, setGetCurrentForecastOnce] = useState<boolean>(true);
-    const [getDailyForecastOnce, setGetDailyForecastOnce] = useState<boolean>(true);
+    const [isMounted, setIsMounted] = useState<boolean>(true);
     const [getEventsOnce, setGetEventsOnce] = useState<boolean>(true);
-    const [getTasksOnce, setGetTasksOnce] = useState<boolean>(true);
     const [currentForecast, setCurrentForecast] = useState<any>({
             main: {
                 feels_like: '-',
@@ -40,26 +39,6 @@ export default function Home(props: any) {
             },
         },
     );
-
-    const [dailyForecast, setDailyForecast] = useState<any[]>([{
-            weekDay: '-',
-            date: '-',
-            humidity: 0,
-            temp: {
-                day: '-',
-                eve: '-',
-                max: '-',
-                min: '-',
-                morn: '-',
-                night: '-',
-            },
-            weather: {
-                description: '-',
-                main: '-',
-            },
-        }],
-    );
-
     const [currentDate, setCurrentDate] = useState<DateModel>({
         day: '',
         hour: '',
@@ -71,356 +50,162 @@ export default function Home(props: any) {
     });
 
     const [events, setEvents] = useState<EventModel[]>([]);
-    const [todayTasks, setTodayTasks] = useState<EventModel[]>([]);
-    const [tomorrowTasks, setTomorrowTasks] = useState<EventModel[]>([]);
-    const [tasks, setTasks] = useState<EventModel[]>([]);
 
     function resetUseState(){
         setGetCurrentForecastOnce(true)
-        setGetTasksOnce(true)
-        setGetDailyForecastOnce(true)
         setGetEventsOnce(true)
-
     }
 
-    function goToWeatherComponent() {
+    function goToHomeComponent() {
 
         resetUseState()
-        props.navigation.navigate('Weather');
+        props.navigation.navigate('Home');
 
     }
+    useEffect(() => {
+        setIsMounted(true)               // note mutable flag
+        return () => { setIsMounted(false) }; // cleanup toggles value, if unmounted
+    }, []);
 
-    function goToHomeIoComponent() {
-        resetUseState()
-        props.navigation.navigate('HomeIo');
-    }
-
-
-
-
-    const styles = StyleSheet.create({
-        spacing: { paddingRight: '5%' },
-        testContainer: {
-            width: '27%',
-            borderWidth: 1.5,
-            borderColor: 'white',
-            borderRadius: 10,
-            flex: 0.33,
-            alignContent: 'center',
-            justifyContent: 'center',
-        },
-        firstColumnsContainer: {
-            flex: 0.33,
-            flexDirection: 'column',
-            backgroundColor: 'black',
-        },
-        firstColumnsView: { flex: 0.33, paddingLeft: '5%', paddingBottom: '3%', paddingTop: '3%' },
-        calendarView: { flex: 0.75, paddingLeft: '5%', paddingBottom: '3%', paddingTop: '3%' },
-        secondColumnsContainer: {
-            flex: 0.33,
-            flexDirection: 'column',
-            backgroundColor: 'black',
-        },
-        secondColumnsView: { flex: 0.33, paddingLeft: '5%', paddingBottom: '3%', paddingTop: '3%' },
-        thirdColumnsContainer: {
-            flex: 0.33,
-            flexDirection: 'column',
-            backgroundColor: 'black',
-        },
-        thirdColumnsView: { flex: 0.33, paddingLeft: '5%', paddingBottom: '3%', paddingTop: '3%' },
-
-        rowContainer: {
-            flex: 1,
-            flexDirection: 'row',
-            backgroundColor: 'black',
-        },
-        clock: {
-            width: '95%',
-            borderWidth: 1.5,
-            borderColor: 'white',
-            borderRadius: 10,
-            flex: 1,
-            alignContent: 'center',
-            justifyContent: 'center',
-        },
-        clockText: {
-            flex: 0.33,
-            paddingLeft: '24%',
-            color: 'white',
-            fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.PRIMARY_INFO,
-
-
-        },
-        clockWeekDay: {
-            fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO,
-            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY,
-            flex: 0.33,
-            paddingLeft: '3%',
-            color: 'white',
-        },
-        clockDate: {
-            fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO,
-            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY,
-            flex: 0.33,
-            paddingLeft: '3%',
-            color: 'white',
-        },
-        temperatureContainer: {
-            flex: 0.5,
-            flexDirection: 'row',
-            alignContent: 'center',
-            justifyContent: 'center',
-        },
-        weatherContainer: {
-            width: '95%',
-            borderWidth: 1.5,
-            borderColor: 'white',
-            borderRadius: 10,
-            flex: 1,
-        },
-        extremeWeatherConditions: {
-            flex: 0.33,
-            color: 'white',
-            fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO,
-            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY
-        },
-        weatherDescription: { flex: 0.33, color: 'white', fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO,fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY },
-        weatherDescriptionImage: { width: 32, height: 32 },
-        temperature: {
-            color: 'white',
-            fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.PRIMARY_INFO,
-            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY,
-            paddingRight: '3%',
-        },
-        homeIoContainer: {
-            width: '95%',
-            borderWidth: 1.5,
-            borderColor: 'white',
-            borderRadius: 10,
-            flex: 1,
-            alignContent: 'center',
-            justifyContent: 'center',
-        },
-        homeIoText: {
-            paddingLeft: '25%',
-            color: 'white',
-            fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.PRIMARY_INFO,
-            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY
-        },
-        calendarContainer: {
-            width: '95%',
-            borderWidth: 1.5,
-            borderColor: 'white',
-            borderRadius: 10,
-            flex: 1,
-        },
-        calendarDate: {
-            paddingLeft: '3%',
-            color: 'white',
-            fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.PRIMARY_INFO,
-            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY
-        },
-        calendarDescription: {
-            paddingLeft: '3%',
-            flex: 0.25,
-            color: 'white',
-            fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO,
-            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY
-        },
-        calendarEvent: {
-            paddingLeft: '3%',
-            paddingTop: '3%',
-            color: 'white',
-            fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.TERTIARY_INFO,
-            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY,
-            borderTopColor: 'white',
-            borderRadius: 5,
-            borderWidth: 1,
-        },
-        todayTasksView: {
-            paddingTop: '50%',
-            flex: 0.6,
-        },
-
-        taskView: {
-            flexDirection: 'row',
-            paddingBottom: '5%',
-        },
-
-        todayTasks: {
-            flex: 0.9,
-            paddingTop: '3%',
-            paddingBottom: '4%',
-            color: 'white',
-            fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.TERTIARY_INFO,
-            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY,
-            borderBottomColor: 'white',
-            borderRadius: 5,
-            borderWidth: 1,
-        },
-
-        doneTaskButton: {
-            flex: 0.06,
-            backgroundColor: 'black',
-            borderColor: 'white',
-            borderRadius: 10,
-            borderWidth: 1,
-            alignContent: 'center',
-            height: 25,
-
-        },
-    });
-
-    useFocusEffect(() => {
+  useFocusEffect(() => {
 
         const intervalCurrentDate = setInterval(async () => {
             setCurrentDate(DateAdapter.getCurrentDate());
 
             Call(() => weatherCurrentAdapter.getCurrent(), currentForecast, getCurrentForecastOnce, currentDate, PROPERTIES.TIME.HALF_HOURLY).then(response => {
 
+                if(!response ||!isMounted) return
+                if(response.error){
+                    setGetCurrentForecastOnce(false);
+                    Alert.alert("Current Forecast Error",response.error)
+                    return
+                }
+
                     setCurrentForecast(response.result);
                     setGetCurrentForecastOnce(false);
                 },
             );
 
-            Call(() => weatherDailyAdapter.getDaily(), dailyForecast, getDailyForecastOnce, currentDate, PROPERTIES.TIME.HOURLY).then(response => {
-
-                    setDailyForecast(response.result);
-                    setGetDailyForecastOnce(false);
-                },
-            );
-
             Call(() => nextEventsAdapter.get(), events, getEventsOnce, currentDate, PROPERTIES.TIME.QUARTER_HOURLY).then(response => {
 
+                if(!isMounted || !response) return
+                if(response.error){
+                    Alert.alert("Current Forecast Error",response.error)
+                    setGetEventsOnce(false);
+                    return
+                }
                 setEvents(response.result);
                 setGetEventsOnce(false);
             });
 
-            Call(() => taskAdapter.get(), tasks, getTasksOnce, currentDate, PROPERTIES.TIME.QUARTER_HOURLY).then(response => {
-                setTasks(response.result);
-                setTodayTasks(FilterTasks.today(response.result))
-                setTomorrowTasks(FilterTasks.tomorrow(response.result))
-
-                setGetTasksOnce(false);
-            });
-
-        }, 1000);
+        }, 700);
 
         return () => clearInterval(intervalCurrentDate);
 
     });
 
+    const styles = StyleSheet.create({
+        clockTextContainer: {
+            flex: 1,
+            flexDirection: 'column',
+            backgroundColor: 'black',
+        },
+        firstColumnsContainer: {
+            flex: 0.5,
+            flexDirection: 'column',
+            backgroundColor: 'black',
+        },
+        secondColumnsContainer: {
+            flex: 0.5,
+            flexDirection: 'column',
+            backgroundColor: 'black',
+        },
+        firstColumnsView: { flex: 1, paddingLeft: '5%',paddingRight:"10%"},
+        container:{flex:1},
+        firstRowContainer:{
+            flex:0.5,
+            backgroundColor:"black"
+        },
+        secondRowContainer:{
+            flex:0.5,
+            flexDirection:"row",
+            backgroundColor:"green"
+        },
+        clockText:{fontSize:200, fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY, color:"white",paddingLeft:"2%",paddingTop:"2%",borderBottomColor:"white",borderWidth:1},
+        clockWeekDay:{fontSize:PROPERTIES.REACT_NATIVE.FONT.SIZE.PRIMARY_INFO, fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY, color:"white", paddingLeft:"20%", paddingBottom:"1%"},
+        temperature: {
+            color: 'white',
+            fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.PRIMARY_INFO,
+            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY,
+            paddingLeft: '40%',
+        },
+        weatherDescriptionImage: { width: 52, height: 52 },
+        calendarEvent: {
+            paddingLeft: '3%',
+            color: 'white',
+            fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.SECONDARY_INFO,
+            fontFamily:PROPERTIES.REACT_NATIVE.FONT.FAMILY,
+            borderBottomColor: 'white',
+            borderWidth: 1,
+        },
+        spacing: { paddingRight: '5%' },
+    });
 
     return (
-        <View style={styles.rowContainer}>
-            <View style={styles.firstColumnsContainer}>
+               <SafeAreaView style={styles.container}>
+           <View style={styles.firstRowContainer}>
+               <TouchableWithoutFeedback onPress={()=>{goToHomeComponent()}}>
 
-                <View style={styles.firstColumnsView}>
-                    <View style={styles.clock}>
+                <View style = {styles.firstColumnsView}>
+                    <View style={styles.clockTextContainer}>
                         <Text
                             style={styles.clockText}>{currentDate.hour}:{currentDate.minute}:{currentDate.second}</Text>
-                        <Text style={styles.clockWeekDay}>{currentDate.weekDay}</Text>
-                        <Text style={styles.clockDate}>{currentDate.day}/{currentDate.month}/{currentDate.year}</Text>
                     </View>
                 </View>
+               </TouchableWithoutFeedback>
+           </View>
+           <View style={styles.secondRowContainer}>
+               <TouchableWithoutFeedback onPress={()=>{goToHomeComponent()}}>
+               <View style={styles.firstColumnsContainer}>
 
-                <View style={styles.secondColumnsView}>
-                    <TouchableWithoutFeedback onPress={() => {
-                        goToWeatherComponent();
-                    }}>
-                        <View style={styles.weatherContainer}>
-                            <View style={styles.temperatureContainer}>
-                                <Text style={styles.temperature}>{currentForecast.main.temp}</Text>
-                                <Image
-                                    style={styles.weatherDescriptionImage}
-                                    source={GetImages.get(currentForecast.weather.main)}
-                                />
+                   <Text style={styles.clockWeekDay}>{currentDate.weekDay}   {currentDate.day}/{currentDate.month}/{currentDate.year}</Text>
 
-                            </View>
-                            <Text style={styles.weatherDescription}>{currentForecast.weather.description}</Text>
-                            <Text style={styles.extremeWeatherConditions}>
-                                from {dailyForecast[0].temp.min} to {dailyForecast[0].temp.max}
-                            </Text>
+                    <View style = {styles.secondRowContainer}>
+                        <View style={styles.firstColumnsContainer}>
+                            <Text style={styles.temperature}>{currentForecast.main.temp}</Text>
                         </View>
-                    </TouchableWithoutFeedback>
 
-                </View>
-
-                <View style={styles.thirdColumnsView}>
-                    <TouchableWithoutFeedback onPress={() => goToHomeIoComponent()}>
-                        <View style={styles.homeIoContainer}>
-                            <Text style={styles.homeIoText}>Home.io</Text>
+                        <View style={styles.secondColumnsContainer}>
+                            <Image
+                                style={styles.weatherDescriptionImage}
+                                source={GetImages.get(currentForecast.weather.main)}
+                            />
                         </View>
-                    </TouchableWithoutFeedback>
-                </View>
-
-            </View>
-
-
-            <View style={styles.secondColumnsContainer}>
-                <SafeAreaView style={styles.todayTasksView}>
-                    <ScrollView>
-                        {todayTasks.map((task, idx) => <View style={styles.taskView} key={idx}>
-                            <TouchableWithoutFeedback onPress={() => {
-                                Alert.alert('Delete task', `Are you sure you want to delete ${task.title} ?`, [{ text: 'Cancel' }, {
-                                    text: 'Yes',
-                                    onPress: () => {
-                                        //TODO: DELETE TASK
-                                    },
-                                }]);
-                            }}><View
-                                style={styles.doneTaskButton}></View>
-                            </TouchableWithoutFeedback>
-
-                            <View style={styles.spacing}></View>
-
-                            <Text
-                                style={styles.todayTasks} key={idx}>Today - {task.title}</Text></View>)}
-
-                        {tomorrowTasks.map((task, idx) => <View style={styles.taskView} key={idx}>
-                            <TouchableWithoutFeedback onPress={() => {
-                                Alert.alert('Delete task', `Are you sure you want to delete ${task.title} ?`, [{ text: 'Cancel' }, {
-                                    text: 'Yes',
-                                    onPress: () => {
-                                        //TODO: DELETE TASK
-                                    },
-                                }]);
-                            }}><View
-                                style={styles.doneTaskButton}></View>
-                            </TouchableWithoutFeedback>
-
-                            <View style={styles.spacing}></View>
-
-                            <Text
-                                style={styles.todayTasks} key={idx}>Tomorrow - {task.title}</Text></View>)}
-                    </ScrollView>
-                </SafeAreaView>
-
-            </View>
-
-            <View style={styles.thirdColumnsContainer}>
-                <View style={styles.calendarView}>
-                    <View style={styles.calendarContainer}>
-                        <Text
-                            style={styles.calendarDate}>{currentDate.day}/{currentDate.month}/{currentDate.year}
-                        </Text>
-
-                        <SafeAreaView style={{ flex: 1 }}>
-                            <ScrollView>
-                                {events.map((event, idx) => {
-                                        return (<Text
-                                            style={styles.calendarEvent}
-                                            key={idx}
-                                        >{event.start.day}/{event.start.month} {event.title}</Text>);
-                                    },
-                                )
-                                }
-                            </ScrollView>
-                        </SafeAreaView>
                     </View>
-                </View>
-            </View>
-        </View>
+
+               </View>
+               </TouchableWithoutFeedback>
+
+               <View style={styles.secondColumnsContainer}>
+                   <SafeAreaView style={{ flex: 0.9, paddingTop:"2%" }}>
+                       <ScrollView>
+                           {events.map((event, idx) => {
+                                   return (<View  style={{paddingBottom:"4%", width:"80%"}} key={idx}><Text
+                                       style={styles.calendarEvent}
+                                       key={idx}
+                                   >{event.start.day}/{event.start.month} {event.title}</Text>
+                                       </View>
+                                   );
+                               },
+                           )
+                           }
+                       </ScrollView>
+                   </SafeAreaView>
+               </View>
+           </View>
+               </SafeAreaView>
+
+
 
     );
 }

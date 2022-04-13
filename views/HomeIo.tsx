@@ -2,7 +2,7 @@ import {StyleSheet, Text, View, Pressable, Image, SafeAreaView, ScrollView} from
 import Properties from '../src/main/aplication/config/properties'
 import {useState} from "react";
 import {blynkHandlerAdapter} from "../src/main/controllers/adapters/blynk-handler-adapter";
-import Call from "../src/main/useCases/uiCall/call";
+import Call from "../src/main/useCases/call";
 import PROPERTIES from "../src/main/aplication/config/properties";
 
 export default function HomeIo(props: any) {

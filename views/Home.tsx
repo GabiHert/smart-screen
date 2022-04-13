@@ -1,6 +1,6 @@
 import { Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import PROPERTIES from '../src/main/aplication/config/properties';
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { DateAdapter } from '../src/main/controllers/adapters/date-adapter';
 import { weatherCurrentAdapter } from '../src/main/controllers/adapters/weather-current-adapter';
 import { DateModel } from '../src/main/domain/date/model/date-model';
@@ -16,6 +16,7 @@ import FilterTasks from "../src/main/domain/builder/filter-tasks";
 
 
 
+
 export default function Home(props: any) {
 
 
@@ -23,6 +24,7 @@ export default function Home(props: any) {
 
 
     const [getCurrentForecastOnce, setGetCurrentForecastOnce] = useState<boolean>(true);
+    const [isMounted, setIsMounted] = useState<boolean>(true);
     const [getDailyForecastOnce, setGetDailyForecastOnce] = useState<boolean>(true);
     const [getEventsOnce, setGetEventsOnce] = useState<boolean>(true);
     const [getTasksOnce, setGetTasksOnce] = useState<boolean>(true);
@@ -76,11 +78,11 @@ export default function Home(props: any) {
     const [tasks, setTasks] = useState<EventModel[]>([]);
 
     function resetUseState(){
+
         setGetCurrentForecastOnce(true)
         setGetTasksOnce(true)
         setGetDailyForecastOnce(true)
         setGetEventsOnce(true)
-
     }
 
     function goToWeatherComponent() {
@@ -90,12 +92,23 @@ export default function Home(props: any) {
 
     }
 
+    function goToLockComponent() {
+        resetUseState()
+        if(!isMounted) return
+        props.navigation.navigate('Lock');
+
+    }
+
     function goToHomeIoComponent() {
+        if(!isMounted) return
         resetUseState()
         props.navigation.navigate('HomeIo');
     }
 
-
+    useEffect(() => {
+        setIsMounted(true)               // note mutable flag
+        return () => { setIsMounted(false) }; // cleanup toggles value, if unmounted
+    }, []);
 
 
     const styles = StyleSheet.create({
@@ -145,7 +158,7 @@ export default function Home(props: any) {
         },
         clockText: {
             flex: 0.33,
-            paddingLeft: '24%',
+            paddingLeft: '30%',
             color: 'white',
             fontSize: PROPERTIES.REACT_NATIVE.FONT.SIZE.PRIMARY_INFO,
 
@@ -277,48 +290,76 @@ export default function Home(props: any) {
             setCurrentDate(DateAdapter.getCurrentDate());
 
             Call(() => weatherCurrentAdapter.getCurrent(), currentForecast, getCurrentForecastOnce, currentDate, PROPERTIES.TIME.HALF_HOURLY).then(response => {
+                if(!isMounted || !response) return
+                if(response.error){
+                    Alert.alert("Current forecast error",response.error)
+                    setGetCurrentForecastOnce(false);
+                    return;
+                }
 
                 setCurrentForecast(response.result);
-                    setGetCurrentForecastOnce(false);
-                },
+                setGetCurrentForecastOnce(false);
+
+                }
+
             );
 
             Call(() => weatherDailyAdapter.getDaily(), dailyForecast, getDailyForecastOnce, currentDate, PROPERTIES.TIME.HOURLY).then(response => {
-
+                if(!isMounted || !response) return
+                if(response.error){
+                    Alert.alert("Daily forecast error",response.error)
+                    setGetDailyForecastOnce(false);
+                    return;
+                }
                 setDailyForecast(response.result);
                     setGetDailyForecastOnce(false);
                 },
             );
 
             Call(() => nextEventsAdapter.get(), events, getEventsOnce, currentDate, PROPERTIES.TIME.QUARTER_HOURLY).then(response => {
-
+                if(!isMounted || !response) return
+                if(response.error){
+                    Alert.alert("Next Events error",response.error)
+                    setGetEventsOnce(false);
+                    return
+                }
                 setEvents(response.result);
                 setGetEventsOnce(false);
             });
 
             Call(() => taskAdapter.get(), tasks, getTasksOnce, currentDate, PROPERTIES.TIME.QUARTER_HOURLY).then(response => {
-                    setTasks(response.result);
-                    setTodayTasks(FilterTasks.today(response.result))
-                    setTomorrowTasks(FilterTasks.tomorrow(response.result))
-
+                if(!isMounted || !response) return
+                if(response.error){
+                    Alert.alert("Next Events error",response.error)
+                    setGetTasksOnce(false);
+                    return
+                }
+                setTasks(response.result);
+                setTodayTasks(FilterTasks.today(response.result))
+                setTomorrowTasks(FilterTasks.tomorrow(response.result))
                 setGetTasksOnce(false);
             });
 
         }, 1000);
 
-        return () => clearInterval(intervalCurrentDate);
+        const timeout = setTimeout(()=>{goToLockComponent()},30000)
+
+        return () => {
+            clearInterval(intervalCurrentDate)
+            clearTimeout(timeout)
+        };
 
     });
 
 
     return (
-        <View style={styles.rowContainer}>
+        <SafeAreaView style={styles.rowContainer}>
             <View style={styles.firstColumnsContainer}>
 
                 <View style={styles.firstColumnsView}>
                     <View style={styles.clock}>
                         <Text
-                            style={styles.clockText}>{currentDate.hour}:{currentDate.minute}:{currentDate.second}</Text>
+                            style={styles.clockText}>{currentDate.hour}:{currentDate.minute}</Text>
                         <Text style={styles.clockWeekDay}>{currentDate.weekDay}</Text>
                         <Text style={styles.clockDate}>{currentDate.day}/{currentDate.month}/{currentDate.year}</Text>
                     </View>
@@ -369,10 +410,10 @@ export default function Home(props: any) {
                                     },
                                 }]);
                             }}><View
-                                style={styles.doneTaskButton}></View>
+    style={styles.doneTaskButton}/>
                             </TouchableWithoutFeedback>
 
-                            <View style={styles.spacing}></View>
+                            <View style={styles.spacing}/>
 
                             <Text
                                 style={styles.todayTasks} key={idx}>Today - {task.title}</Text></View>)}
@@ -386,10 +427,10 @@ export default function Home(props: any) {
                                     },
                                 }]);
                             }}><View
-                                style={styles.doneTaskButton}></View>
+    style={styles.doneTaskButton}/>
                             </TouchableWithoutFeedback>
 
-                            <View style={styles.spacing}></View>
+                            <View style={styles.spacing}/>
 
                             <Text
                                 style={styles.todayTasks} key={idx}>Tomorrow - {task.title}</Text></View>)}
@@ -420,7 +461,7 @@ export default function Home(props: any) {
                     </View>
                 </View>
             </View>
-        </View>
+        </SafeAreaView>
 
     );
 }
